@@ -49,10 +49,9 @@ function LevelOneForest() {
     if (screen === 2 && allPicked) {
       setScreen(3);
       setFeedback("You made a magical bouquet!");
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      const parsed = Number(raw);
-      const current = Number.isFinite(parsed) ? parsed : 1;
-      window.localStorage.setItem(STORAGE_KEY, String(Math.max(current, 2)));
+      if (typeof window !== "undefined" && "localStorage" in window) {
+        window.localStorage.setItem(STORAGE_KEY, "2");
+      }
     }
   }, [screen, allPicked]);
 

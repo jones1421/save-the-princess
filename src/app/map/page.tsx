@@ -10,6 +10,11 @@ export default function MapPage() {
   const [highestUnlocked, setHighestUnlocked] = useState(1);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !("localStorage" in window)) {
+      setHighestUnlocked(1);
+      return;
+    }
+
     const raw = window.localStorage.getItem(STORAGE_KEY);
     const parsed = Number(raw);
     const value = Number.isFinite(parsed) && parsed >= 1 ? Math.min(parsed, LEVEL_COUNT) : 1;
@@ -17,6 +22,7 @@ export default function MapPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !("localStorage" in window)) return;
     window.localStorage.setItem(STORAGE_KEY, String(highestUnlocked));
   }, [highestUnlocked]);
 
