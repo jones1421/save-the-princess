@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import HelperTray, { HelperId } from "@/components/HelperTray";
 import NarrationBox from "@/components/NarrationBox";
 
-const STORAGE_KEY = "savetheprincess.progress";
+import { normalizeProgress, PROGRESS_STORAGE_KEY } from "@/game/lib/progress";
+
 const GENTLE_ERROR = "Hmm, I don't think I can do that — try a different friend!";
 
 type PhaserGameProps = {
@@ -50,7 +51,10 @@ function LevelOneForest() {
       setScreen(3);
       setFeedback("You made a magical bouquet!");
       if (typeof window !== "undefined" && "localStorage" in window) {
-        window.localStorage.setItem(STORAGE_KEY, "2");
+        const parsed = Number(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "1");
+        const currentProgress = normalizeProgress(parsed);
+        const nextProgress = Math.max(currentProgress, 2);
+        window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(nextProgress));
       }
     }
   }, [screen, allPicked]);
