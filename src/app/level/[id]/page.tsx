@@ -16,6 +16,11 @@ export default function LevelPage({ params }: LevelPageProps) {
   const [highestUnlocked, setHighestUnlocked] = useState(1);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !("localStorage" in window)) {
+      setHighestUnlocked(1);
+      return;
+    }
+
     const raw = window.localStorage.getItem(STORAGE_KEY);
     const parsed = Number(raw);
     const value = Number.isFinite(parsed) && parsed >= 1 ? Math.min(parsed, LEVEL_COUNT) : 1;
