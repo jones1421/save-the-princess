@@ -3,28 +3,23 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "savetheprincess.progress";
+import { normalizeProgress, PROGRESS_STORAGE_KEY } from "@/game/lib/progress";
+
 const LEVEL_COUNT = 5;
 
 export default function MapPage() {
-  const [highestUnlocked, setHighestUnlocked] = useState(1);
+  const [progress, setProgress] = useState(1);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("localStorage" in window)) {
-      setHighestUnlocked(1);
+      setProgress(1);
       return;
     }
 
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = Number(raw);
-    const value = Number.isFinite(parsed) && parsed >= 1 ? Math.min(parsed, LEVEL_COUNT) : 1;
-    setHighestUnlocked(value);
+    const parsed = Number(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "1");
+    setProgress(normalizeProgress(parsed, LEVEL_COUNT));
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined" || !("localStorage" in window)) return;
-    window.localStorage.setItem(STORAGE_KEY, String(highestUnlocked));
-  }, [highestUnlocked]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-sky-100 via-indigo-100 to-pink-100 p-6">
@@ -35,7 +30,7 @@ export default function MapPage() {
         <ol className="mt-10 space-y-4">
           {Array.from({ length: LEVEL_COUNT }, (_, i) => {
             const id = i + 1;
-            const unlocked = id <= highestUnlocked;
+            const unlocked = id <= progress;
             const alignment = i % 2 === 0 ? "justify-start" : "justify-end";
             return (
               <li key={id} className={`flex ${alignment}`}>
@@ -61,7 +56,12 @@ export default function MapPage() {
         <div className="mt-8 text-center">
           <button
             type="button"
-            onClick={() => setHighestUnlocked(1)}
+            onClick={() => {
+              setProgress(1);
+              if (typeof window !== "undefined" && "localStorage" in window) {
+                window.localStorage.setItem(PROGRESS_STORAGE_KEY, "1");
+              }
+            }}
             className="rounded-full bg-white border-2 border-indigo-300 px-5 py-2 text-indigo-700 font-semibold"
           >
             Reset Progress

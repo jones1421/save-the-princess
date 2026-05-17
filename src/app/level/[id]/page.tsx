@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import PhaserGame from "@/components/PhaserGame";
 
-const STORAGE_KEY = "savetheprincess.progress";
+import { normalizeProgress, PROGRESS_STORAGE_KEY } from "@/game/lib/progress";
+
 const LEVEL_COUNT = 5;
 
 type LevelPageProps = {
@@ -13,18 +14,16 @@ type LevelPageProps = {
 
 export default function LevelPage({ params }: LevelPageProps) {
   const levelId = useMemo(() => Number(params.id), [params.id]);
-  const [highestUnlocked, setHighestUnlocked] = useState(1);
+  const [progress, setProgress] = useState(1);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("localStorage" in window)) {
-      setHighestUnlocked(1);
+      setProgress(1);
       return;
     }
 
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = Number(raw);
-    const value = Number.isFinite(parsed) && parsed >= 1 ? Math.min(parsed, LEVEL_COUNT) : 1;
-    setHighestUnlocked(value);
+    const parsed = Number(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "1");
+    setProgress(normalizeProgress(parsed, LEVEL_COUNT));
   }, []);
 
   if (!Number.isInteger(levelId) || levelId < 1 || levelId > LEVEL_COUNT) {
@@ -35,7 +34,7 @@ export default function LevelPage({ params }: LevelPageProps) {
     );
   }
 
-  const locked = levelId > highestUnlocked;
+  const locked = levelId > progress;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100 p-6">
