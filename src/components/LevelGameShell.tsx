@@ -5,11 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import HelperTray, { HelperId } from "@/components/HelperTray";
 import NarrationBox from "@/components/NarrationBox";
 
-import { normalizeProgress, PROGRESS_STORAGE_KEY } from "@/game/lib/progress";
+import { PRIMARY_TAP_TARGET } from "@/components/tapTarget";
+import { unlockAtLeast } from "@/game/lib/progress";
 
 const GENTLE_ERROR = "Hmm, I don't think I can do that — try a different friend!";
 
-type PhaserGameProps = {
+type LevelGameShellProps = {
   levelId: number;
 };
 
@@ -51,10 +52,7 @@ function LevelOneForest() {
       setScreen(3);
       setFeedback("You made a magical bouquet!");
       if (typeof window !== "undefined" && "localStorage" in window) {
-        const parsed = Number(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "1");
-        const currentProgress = normalizeProgress(parsed);
-        const nextProgress = Math.max(currentProgress, 2);
-        window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(nextProgress));
+        unlockAtLeast(2);
       }
     }
   }, [screen, allPicked]);
@@ -176,7 +174,7 @@ function LevelOneForest() {
           </div>
           <a
             href="/map"
-            className="inline-flex items-center justify-center rounded-full bg-pink-500 text-white font-extrabold text-xl px-8 py-4 min-h-24"
+            className={`inline-flex items-center justify-center rounded-full bg-pink-500 text-white font-extrabold text-xl px-8 py-4 ${PRIMARY_TAP_TARGET}`}
           >
             Back to Map
           </a>
@@ -186,7 +184,7 @@ function LevelOneForest() {
   );
 }
 
-function PlaceholderGame({ levelId }: PhaserGameProps) {
+function PlaceholderGame({ levelId }: LevelGameShellProps) {
   if (levelId !== 1) {
     return (
       <div className="rounded-2xl border-4 border-indigo-300 bg-indigo-50 p-6 h-72 flex items-center justify-center text-center">
@@ -202,6 +200,6 @@ function PlaceholderGame({ levelId }: PhaserGameProps) {
   return <LevelOneForest />;
 }
 
-const PhaserGame = dynamic(async () => PlaceholderGame, { ssr: false });
+const LevelGameShell = dynamic(async () => PlaceholderGame, { ssr: false });
 
-export default PhaserGame;
+export default LevelGameShell;

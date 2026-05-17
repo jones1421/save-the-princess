@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import PhaserGame from "@/components/PhaserGame";
-
-import { normalizeProgress, PROGRESS_STORAGE_KEY } from "@/game/lib/progress";
-
-const LEVEL_COUNT = 5;
+import LevelGameShell from "@/components/LevelGameShell";
+import { PRIMARY_TAP_TARGET } from "@/components/tapTarget";
+import { LEVEL_COUNT } from "@/game/lib/constants";
+import { getProgress } from "@/game/lib/progress";
 
 type LevelPageProps = {
   params: { id: string };
@@ -17,13 +16,7 @@ export default function LevelPage({ params }: LevelPageProps) {
   const [progress, setProgress] = useState(1);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("localStorage" in window)) {
-      setProgress(1);
-      return;
-    }
-
-    const parsed = Number(localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "1");
-    setProgress(normalizeProgress(parsed, LEVEL_COUNT));
+    setProgress(getProgress());
   }, []);
 
   if (!Number.isInteger(levelId) || levelId < 1 || levelId > LEVEL_COUNT) {
@@ -43,7 +36,7 @@ export default function LevelPage({ params }: LevelPageProps) {
           <h1 className="text-4xl font-extrabold text-indigo-700">
             Level {levelId}{levelId === 1 ? " — The Enchanted Forest" : ""}
           </h1>
-          <Link href="/map" className="rounded-full bg-indigo-500 text-white px-5 py-2 font-semibold">Back to Map</Link>
+          <Link href="/map" className={`rounded-full bg-indigo-500 text-white px-5 py-2 font-semibold inline-flex items-center ${PRIMARY_TAP_TARGET}`}>Back to Map</Link>
         </div>
 
         {locked ? (
@@ -51,7 +44,7 @@ export default function LevelPage({ params }: LevelPageProps) {
             <p className="text-2xl font-bold text-slate-600">🔒 This level is still locked.</p>
           </div>
         ) : (
-          <PhaserGame levelId={levelId} />
+          <LevelGameShell levelId={levelId} />
         )}
       </section>
     </main>

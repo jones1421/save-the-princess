@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import NarrationBox from "@/components/NarrationBox";
+import { PRIMARY_TAP_TARGET } from "@/components/tapTarget";
 
 const SLIDE_DURATION_MS = 4000;
 
@@ -58,14 +59,14 @@ export default function IntroPage() {
             <button
               type="button"
               onClick={() => setIndex((prev) => Math.min(prev + 1, slides.length - 1))}
-              className="rounded-full bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 font-bold"
+              className={`rounded-full bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 font-bold ${PRIMARY_TAP_TARGET}`}
             >
               Next Slide
             </button>
           ) : (
             <Link
               href="/map"
-              className="rounded-full bg-pink-500 hover:bg-pink-600 text-white px-7 py-3 text-lg font-extrabold"
+              className={`rounded-full bg-pink-500 hover:bg-pink-600 text-white px-7 py-3 text-lg font-extrabold inline-flex items-center ${PRIMARY_TAP_TARGET}`}
             >
               Go to Map
             </Link>

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { speakText } from "@/game/lib/narration";
+import { PRIMARY_TAP_TARGET } from "@/components/tapTarget";
 
 type NarrationBoxProps = {
   text: string;
@@ -20,7 +21,7 @@ export default function NarrationBox({ text, autoSpeak = false }: NarrationBoxPr
       <button
         type="button"
         onClick={() => speakText(text)}
-        className="mt-4 rounded-full bg-fuchsia-500 hover:bg-fuchsia-600 text-white px-5 py-2 font-semibold"
+        className={`mt-4 rounded-full bg-fuchsia-500 hover:bg-fuchsia-600 text-white px-5 py-2 font-semibold ${PRIMARY_TAP_TARGET}`}
       >
         Hear Narration
       </button>
