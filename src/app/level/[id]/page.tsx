@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import HelperTray from "@/components/HelperTray";
 import PhaserGame from "@/components/PhaserGame";
-import NarrationBox from "@/components/NarrationBox";
 
 const STORAGE_KEY = "savetheprincess.progress";
 const LEVEL_COUNT = 5;
@@ -37,8 +35,10 @@ export default function LevelPage({ params }: LevelPageProps) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100 p-6">
       <section className="mx-auto max-w-5xl rounded-3xl border-4 border-indigo-200 bg-white/80 p-8 shadow-xl space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-extrabold text-indigo-700">Level {levelId}</h1>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h1 className="text-4xl font-extrabold text-indigo-700">
+            Level {levelId}{levelId === 1 ? " — The Enchanted Forest" : ""}
+          </h1>
           <Link href="/map" className="rounded-full bg-indigo-500 text-white px-5 py-2 font-semibold">Back to Map</Link>
         </div>
 
@@ -47,11 +47,7 @@ export default function LevelPage({ params }: LevelPageProps) {
             <p className="text-2xl font-bold text-slate-600">🔒 This level is still locked.</p>
           </div>
         ) : (
-          <>
-            <NarrationBox text="Welcome to Level 1! Meet your helpers and get ready for puzzle adventures." autoSpeak />
-            <PhaserGame levelId={levelId} />
-            <HelperTray />
-          </>
+          <PhaserGame levelId={levelId} />
         )}
       </section>
     </main>
