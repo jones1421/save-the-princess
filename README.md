@@ -64,3 +64,15 @@ npm run build
 - Wrong helper taps keep the gentle guidance message: "Hmm, I don't think I can do that — try a different friend!"
 - Inactivity hints are included for Level 2 screens
 - Completing Level 2 unlocks Level 3 (`savetheprincess.progress = 3`) and returns to map via button
+
+
+### Phase 5 (complete: Level 3 — The Sparkle Cave)
+
+- Level 3 is now playable end-to-end with 3 screens in "The Sparkle Cave"
+- Screen 1 uses Ruby the Dragon to brighten a dark cave entrance with warm light
+- Screen 2 includes a crystal music puzzle where any crystal order succeeds and shows notes
+- Screen 3 uses Whiskers the Kitten to tiptoe past a sweet sleeping bat
+- Helper tray supports Ruby + Whiskers for Level 3
+- Wrong helper taps keep the gentle guidance message: "Hmm, I don't think I can do that — try a different friend!"
+- Inactivity hints are included for Level 3 screens
+- Completing Level 3 unlocks Level 4 (`savetheprincess.progress = 4`) and auto-returns to map

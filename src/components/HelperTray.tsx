@@ -1,6 +1,6 @@
 "use client";
 
-type HelperId = "leo" | "buttercup" | "pip" | "sparkle" | "flutter";
+type HelperId = "leo" | "buttercup" | "pip" | "sparkle" | "flutter" | "ruby" | "whiskers";
 
 type Helper = {
   id: HelperId;
@@ -14,6 +14,8 @@ const allHelpers: Record<HelperId, Helper> = {
   pip: { id: "pip", name: "Pip the Puppy", emoji: "🐶" },
   sparkle: { id: "sparkle", name: "Sparkle the Unicorn", emoji: "🦄" },
   flutter: { id: "flutter", name: "Flutter the Butterfly", emoji: "🦋" },
+  ruby: { id: "ruby", name: "Ruby the Dragon", emoji: "🐉" },
+  whiskers: { id: "whiskers", name: "Whiskers the Kitten", emoji: "🐱" },
 };
 
 type HelperTrayProps = {

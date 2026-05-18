@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import HelperTray, { HelperId } from "@/components/HelperTray";
 import NarrationBox from "@/components/NarrationBox";
 
@@ -208,9 +209,118 @@ function LevelTwoRainbowRiver() {
   );
 }
 
+function LevelThreeSparkleCave() {
+  const router = useRouter();
+  const [screen, setScreen] = useState<1 | 2 | 3>(1);
+  const [activeHelper, setActiveHelper] = useState<HelperId>("ruby");
+  const [feedback, setFeedback] = useState("The cave is dark. Ruby can brighten it with warm light.");
+  const [crystalNotes, setCrystalNotes] = useState<string[]>([]);
+  const [tiptoedPastBat, setTiptoedPastBat] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (screen === 1) setFeedback("Hint: Ruby the Dragon can glow and light the cave.");
+      if (screen === 2) setFeedback("Hint: Tap any crystal to hear and see a musical note.");
+      if (screen === 3) setFeedback("Hint: Whiskers the Kitten is gentle and quiet on tiny paws.");
+    }, 15000);
+
+    return () => window.clearTimeout(timer);
+  }, [screen, activeHelper, crystalNotes.length, tiptoedPastBat]);
+
+  useEffect(() => {
+    if (!tiptoedPastBat) return;
+    unlockAtLeast(4);
+    const timer = window.setTimeout(() => router.push("/map"), 1800);
+    return () => window.clearTimeout(timer);
+  }, [tiptoedPastBat, router]);
+
+  const brightenCave = () => {
+    if (activeHelper !== "ruby") return void setFeedback(GENTLE_ERROR);
+    setFeedback("Ruby glows like a cozy lantern, and the cave sparkles awake! ✨");
+    setScreen(2);
+  };
+
+  const playCrystal = (note: string, color: string) => {
+    setCrystalNotes((prev) => (prev.length >= 5 ? [...prev.slice(1), note] : [...prev, note]));
+    setFeedback(`The ${color} crystal sings: ${note} ♪`);
+  };
+
+  const approachBat = () => {
+    if (activeHelper !== "whiskers") return void setFeedback(GENTLE_ERROR);
+    setTiptoedPastBat(true);
+    setFeedback("Whiskers tiptoes softly past the sleepy bat. Shhh... success! 💤");
+  };
+
+  return (
+    <div className="space-y-5">
+      {screen === 1 && (
+        <>
+          <NarrationBox text="Screen 1: The Sparkle Cave entrance is dark. Use Ruby the Dragon to brighten it with warm glowing light." autoSpeak />
+          <div className="rounded-3xl border-4 border-violet-200 bg-violet-50 p-6 text-center">
+            <div className="h-52 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-700 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-40">🕳️</div>
+              <div className="absolute left-6 bottom-4 text-5xl">🧒</div>
+              <div className="absolute right-8 bottom-6 text-5xl">🐉</div>
+            </div>
+            <button type="button" onClick={brightenCave} className="mt-4 rounded-full bg-orange-500 text-white font-extrabold text-xl px-8 py-4 min-h-24">Brighten the Cave</button>
+          </div>
+          <HelperTray activeHelper={activeHelper} onSelectHelper={setActiveHelper} helperIds={["ruby", "whiskers"]} />
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">{feedback}</p>
+        </>
+      )}
+
+      {screen === 2 && (
+        <>
+          <NarrationBox text="Screen 2: Tap the colorful cave crystals in any order to make magical music." autoSpeak />
+          <div className="rounded-3xl border-4 border-cyan-200 bg-cyan-50 p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { note: "Do", color: "pink", style: "bg-pink-200 border-pink-400" },
+                { note: "Re", color: "blue", style: "bg-blue-200 border-blue-400" },
+                { note: "Mi", color: "green", style: "bg-green-200 border-green-400" },
+                { note: "Fa", color: "purple", style: "bg-purple-200 border-purple-400" },
+              ].map((crystal) => (
+                <button key={crystal.note} type="button" onClick={() => playCrystal(crystal.note, crystal.color)} className={`min-h-24 rounded-2xl border-4 ${crystal.style} p-4 text-center`}>
+                  <div className="text-4xl">💎</div>
+                  <p className="mt-1 text-xl font-bold text-slate-800">{crystal.note} ♪</p>
+                </button>
+              ))}
+            </div>
+            <p className="mt-4 text-center text-lg font-semibold text-cyan-900">Crystal melody: {crystalNotes.length > 0 ? crystalNotes.join(" • ") : "Tap any crystal to begin!"}</p>
+            <button type="button" onClick={() => setScreen(3)} className="mt-5 w-full rounded-full bg-indigo-500 text-white font-extrabold text-xl px-8 py-4 min-h-24">Continue Through the Cave</button>
+          </div>
+          <HelperTray activeHelper={activeHelper} onSelectHelper={setActiveHelper} helperIds={["ruby", "whiskers"]} />
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">{feedback}</p>
+        </>
+      )}
+
+      {screen === 3 && (
+        <>
+          <NarrationBox text="Screen 3: A sweet sleeping bat blocks the path. Use Whiskers the Kitten to tiptoe past." autoSpeak />
+          <div className="rounded-3xl border-4 border-rose-200 bg-rose-50 p-6 text-center">
+            <div className="text-6xl">🧒 💤🦇 🌟</div>
+            <button type="button" onClick={approachBat} className="mt-4 rounded-full bg-rose-500 text-white font-extrabold text-xl px-8 py-4 min-h-24">Tiptoe Past the Bat</button>
+          </div>
+          <HelperTray activeHelper={activeHelper} onSelectHelper={setActiveHelper} helperIds={["ruby", "whiskers"]} />
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">{feedback}</p>
+
+          {tiptoedPastBat && (
+            <div className="rounded-3xl border-4 border-yellow-300 bg-yellow-100 p-8 text-center min-h-24">
+              <div className="text-6xl">✨🐉🎵🐾🎉</div>
+              <p className="mt-4 text-3xl font-extrabold text-yellow-800">Hooray! You lit the Sparkle Cave and unlocked Level 4!</p>
+              <p className="mt-2 text-lg text-yellow-900">Heading back to the map...</p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 function PlaceholderGame({ levelId }: LevelGameShellProps) {
   if (levelId === 1) return <LevelOneForest />;
   if (levelId === 2) return <LevelTwoRainbowRiver />;
+  if (levelId === 3) return <LevelThreeSparkleCave />;
 
   return (
     <div className="rounded-2xl border-4 border-indigo-300 bg-indigo-50 p-6 h-72 flex items-center justify-center text-center">
