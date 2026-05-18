@@ -53,3 +53,14 @@ npm run build
 - 15-second inactivity hint auto-suggests with Pip and highlights the next hotspot
 - Screen 3 shows bouquet completion reward and unlocks Level 2 (`savetheprincess.progress = 2`)
 - Return-to-map flow shows Level 2 unlocked
+
+### Phase 4 (complete: Level 2 — The Rainbow River)
+
+- Level 2 is now playable end-to-end with 3 screens in "The Rainbow River"
+- Screen 1 uses Sparkle the Unicorn to create a rainbow bridge over a wide river
+- Screen 2 introduces Flutter the Butterfly to reach a flower on a high cliff
+- Screen 3 crosses a smaller stream, gathers more star-flowers, and gives a sparkle reward
+- Helper tray supports level-specific helpers and now includes Sparkle + Flutter for Level 2
+- Wrong helper taps keep the gentle guidance message: "Hmm, I don't think I can do that — try a different friend!"
+- Inactivity hints are included for Level 2 screens
+- Completing Level 2 unlocks Level 3 (`savetheprincess.progress = 3`) and returns to map via button
