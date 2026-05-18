@@ -1,6 +1,6 @@
 "use client";
 
-type HelperId = "leo" | "buttercup" | "pip";
+type HelperId = "leo" | "buttercup" | "pip" | "sparkle" | "flutter";
 
 type Helper = {
   id: HelperId;
@@ -8,18 +8,23 @@ type Helper = {
   emoji: string;
 };
 
-const helpers: Helper[] = [
-  { id: "leo", name: "Prince Leo", emoji: "🤴" },
-  { id: "buttercup", name: "Buttercup the Bunny", emoji: "🐰" },
-  { id: "pip", name: "Pip the Puppy", emoji: "🐶" },
-];
+const allHelpers: Record<HelperId, Helper> = {
+  leo: { id: "leo", name: "Prince Leo", emoji: "🤴" },
+  buttercup: { id: "buttercup", name: "Buttercup the Bunny", emoji: "🐰" },
+  pip: { id: "pip", name: "Pip the Puppy", emoji: "🐶" },
+  sparkle: { id: "sparkle", name: "Sparkle the Unicorn", emoji: "🦄" },
+  flutter: { id: "flutter", name: "Flutter the Butterfly", emoji: "🦋" },
+};
 
 type HelperTrayProps = {
   activeHelper: HelperId;
   onSelectHelper: (id: HelperId) => void;
+  helperIds?: HelperId[];
 };
 
-export default function HelperTray({ activeHelper, onSelectHelper }: HelperTrayProps) {
+export default function HelperTray({ activeHelper, onSelectHelper, helperIds = ["leo", "buttercup", "pip"] }: HelperTrayProps) {
+  const helpers = helperIds.map((id) => allHelpers[id]);
+
   return (
     <aside className="rounded-2xl border-4 border-pink-200 bg-pink-50 p-4">
       <h3 className="text-2xl font-extrabold text-pink-700">Helper Friends</h3>
