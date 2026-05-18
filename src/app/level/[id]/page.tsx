@@ -34,7 +34,7 @@ export default function LevelPage({ params }: LevelPageProps) {
       <section className="mx-auto max-w-5xl rounded-3xl border-4 border-indigo-200 bg-white/80 p-8 shadow-xl space-y-6">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <h1 className="text-4xl font-extrabold text-indigo-700">
-            Level {levelId}{levelId === 1 ? " — The Enchanted Forest" : levelId === 2 ? " — The Rainbow River" : ""}
+            Level {levelId}{levelId === 1 ? " — The Enchanted Forest" : levelId === 2 ? " — The Rainbow River" : levelId === 3 ? " — The Sparkle Cave" : ""}
           </h1>
           <Link href="/map" className={`rounded-full bg-indigo-500 text-white px-5 py-2 font-semibold inline-flex items-center ${PRIMARY_TAP_TARGET}`}>Back to Map</Link>
         </div>
