@@ -37,7 +37,9 @@ export default function LevelPage({ params }: LevelPageProps) {
           ? "The Sparkle Cave"
           : levelId === 4
             ? "The Witch's Garden"
-            : "";
+            : levelId === 5
+              ? "The Tower"
+              : "";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-indigo-100 to-purple-100 p-6">

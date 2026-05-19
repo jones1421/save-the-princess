@@ -8,7 +8,7 @@ import NarrationBox from "@/components/NarrationBox";
 
 import { speakText } from "@/game/lib/narration";
 import { PRIMARY_TAP_TARGET } from "@/components/tapTarget";
-import { unlockAtLeast } from "@/game/lib/progress";
+import { setProgress, unlockAtLeast } from "@/game/lib/progress";
 
 const GENTLE_ERROR =
   "Hmm, I don't think I can do that — try a different friend!";
@@ -847,11 +847,212 @@ function LevelFourWitchsGarden() {
   );
 }
 
+
+function LevelFiveTowerFinale() {
+  const router = useRouter();
+  const [screen, setScreen] = useState<1 | 2 | 3>(1);
+  const [feedback, setFeedback] = useState(
+    "Tap the tower door to say hello to Morgana.",
+  );
+  const [doorOpened, setDoorOpened] = useState(false);
+  const [kindnessDone, setKindnessDone] = useState<
+    Record<"flower" | "song" | "tea", boolean>
+  >({ flower: false, song: false, tea: false });
+  const [hintTarget, setHintTarget] = useState<
+    "door" | "flower" | "song" | "tea" | "playAgain" | "backToMap" | null
+  >(null);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const allKindnessDone =
+    kindnessDone.flower && kindnessDone.song && kindnessDone.tea;
+
+  useEffect(() => {
+    if (screen === 2 && allKindnessDone) {
+      setScreen(3);
+      const message =
+        "Look! Morgana is smiling! She wasn’t bad — she was just lonely. Now everyone is friends. You saved the princess AND the witch. You are the kindest hero ever!";
+      setFeedback(message);
+      speakFeedback(message);
+      unlockAtLeast(5);
+    }
+  }, [screen, allKindnessDone]);
+
+  useEffect(() => {
+    setHintTarget(null);
+    if (screen === 1 && !doorOpened) {
+      const timer = window.setTimeout(() => {
+        const hint = "Hint: Knock on the big tower door.";
+        setHintTarget("door");
+        setFeedback(hint);
+        speakFeedback(hint);
+      }, 15000);
+      return () => window.clearTimeout(timer);
+    }
+
+    if (screen === 2 && !allKindnessDone) {
+      const timer = window.setTimeout(() => {
+        const nextChoice = (["flower", "song", "tea"] as const).find(
+          (choiceId) => !kindnessDone[choiceId],
+        );
+        if (!nextChoice) return;
+        const hint = "Hint: Try a kindness choice for Morgana.";
+        setHintTarget(nextChoice);
+        setFeedback(hint);
+        speakFeedback(hint);
+      }, 15000);
+      return () => window.clearTimeout(timer);
+    }
+
+    if (screen === 3) {
+      const timer = window.setTimeout(() => {
+        const hint = "Hint: Tap Play Again or Back to Map.";
+        setHintTarget(confirmReset ? "backToMap" : "playAgain");
+        setFeedback(hint);
+        speakFeedback(hint);
+      }, 15000);
+      return () => window.clearTimeout(timer);
+    }
+  }, [screen, doorOpened, allKindnessDone, kindnessDone, confirmReset]);
+
+  const openDoor = () => {
+    const message =
+      "Morgana opens the door. She looks grumpy, but also very lonely.";
+    setDoorOpened(true);
+    setScreen(2);
+    setHintTarget(null);
+    setFeedback(message);
+    speakFeedback(message);
+  };
+
+  const chooseKindness = (
+    choice: "flower" | "song" | "tea",
+    response: string,
+  ) => {
+    if (kindnessDone[choice]) return;
+    setKindnessDone((prev) => ({ ...prev, [choice]: true }));
+    setHintTarget(null);
+    setFeedback(response);
+    speakFeedback(response);
+  };
+
+  return (
+    <div className="space-y-5">
+      {screen === 1 && (
+        <>
+          <NarrationBox
+            text="Approach the tower and knock on the door."
+            autoSpeak
+          />
+          <div className="rounded-3xl border-4 border-purple-200 bg-purple-50 p-6 text-center">
+            <div className="h-64 rounded-2xl bg-gradient-to-b from-pink-100 to-indigo-100 relative overflow-hidden">
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-12 h-44 w-52 rounded-t-[6rem] border-4 border-indigo-400 bg-indigo-200" />
+              <div className={`absolute left-1/2 -translate-x-1/2 bottom-16 h-24 w-20 rounded-t-3xl border-4 border-amber-700 bg-amber-500 transition ${hintTarget === "door" ? "ring-4 ring-fuchsia-300 scale-105" : ""}`} />
+              <div className="absolute top-4 right-6 text-4xl">☁️</div>
+              <div className="absolute top-10 left-8 text-4xl">✨</div>
+            </div>
+            <button
+              type="button"
+              onClick={openDoor}
+              className={`mt-4 w-full rounded-full bg-fuchsia-500 text-white font-extrabold text-xl px-8 py-4 min-h-20 ${hintTarget === "door" ? "ring-4 ring-fuchsia-300" : ""}`}
+            >
+              Knock on the Door
+            </button>
+          </div>
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">
+            {feedback}
+          </p>
+        </>
+      )}
+
+      {screen === 2 && (
+        <>
+          <NarrationBox text={feedback} autoSpeak />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {([
+              ["flower", "🌸", "Give Morgana the flower", "Morgana holds the flower gently. ‘You brought this for me?’"],
+              ["song", "🎵", "Sing her a song", "The friends sing a soft, happy song. Morgana’s frown begins to melt."],
+              ["tea", "🫖", "Invite her to tea", "Everyone invites Morgana to tea. She smiles a tiny smile."],
+            ] as const).map(([id, emoji, label, response]) => {
+              const done = kindnessDone[id];
+              const highlighted = hintTarget === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => chooseKindness(id, response)}
+                  className={`rounded-3xl border-4 p-5 text-center min-h-20 transition ${done ? "border-yellow-400 bg-yellow-100" : highlighted ? "border-fuchsia-500 bg-fuchsia-100 ring-4 ring-fuchsia-300" : "border-indigo-300 bg-white hover:bg-indigo-50"}`}
+                >
+                  <div className="text-6xl">{emoji}</div>
+                  <p className="mt-3 text-2xl font-extrabold text-indigo-700">{label}</p>
+                  <p className="mt-2 text-indigo-800">{done ? "Done!" : "Tap to choose"}</p>
+                </button>
+              );
+            })}
+          </div>
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">
+            {feedback}
+          </p>
+        </>
+      )}
+
+      {screen === 3 && (
+        <>
+          <NarrationBox
+            text="Look! Morgana is smiling! She wasn’t bad — she was just lonely. Now everyone is friends. You saved the princess AND the witch. You are the kindest hero ever!"
+            autoSpeak
+          />
+          <div className="rounded-3xl border-4 border-yellow-300 bg-yellow-100 p-8 text-center">
+            <div className="text-6xl">🧙‍♀️😊 👸 🎉</div>
+            <p className="mt-3 text-2xl font-extrabold text-yellow-800">
+              Princess Lily is free, and everyone is friends!
+            </p>
+            <div className="mt-4 text-4xl">✨🎊✨🎉✨</div>
+          </div>
+
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => {
+                if (!confirmReset) {
+                  const prompt = "Are you sure you want to start over?";
+                  setConfirmReset(true);
+                  setFeedback(prompt);
+                  speakFeedback(prompt);
+                  return;
+                }
+                setConfirmReset(false);
+                setHintTarget(null);
+                setFeedback("Starting over from Level 1. Have fun!");
+                speakFeedback("Starting over from Level 1. Have fun!");
+                setProgress(1);
+                router.push("/map");
+              }}
+              className={`w-full rounded-full bg-pink-500 text-white font-extrabold text-xl px-8 py-4 min-h-20 ${hintTarget === "playAgain" ? "ring-4 ring-fuchsia-300" : ""}`}
+            >
+              {confirmReset ? "Tap Again to Confirm Reset" : "Play Again"}
+            </button>
+            <a
+              href="/map"
+              className={`w-full inline-flex items-center justify-center rounded-full bg-indigo-500 text-white font-extrabold text-xl px-8 py-4 min-h-20 ${hintTarget === "backToMap" ? "ring-4 ring-fuchsia-300" : ""}`}
+            >
+              Back to Map
+            </a>
+          </div>
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">
+            {feedback}
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
 function PlaceholderGame({ levelId }: LevelGameShellProps) {
   if (levelId === 1) return <LevelOneForest />;
   if (levelId === 2) return <LevelTwoRainbowRiver />;
   if (levelId === 3) return <LevelThreeSparkleCave />;
   if (levelId === 4) return <LevelFourWitchsGarden />;
+  if (levelId === 5) return <LevelFiveTowerFinale />;
 
   return (
     <div className="rounded-2xl border-4 border-indigo-300 bg-indigo-50 p-6 h-72 flex items-center justify-center text-center">
