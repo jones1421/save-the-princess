@@ -86,3 +86,15 @@ npm run build
 - Inactivity hints highlight the next untapped animal or the flower after 15 seconds
 - Completing Level 4 unlocks Level 5 (`savetheprincess.progress = 5`)
 - Return-to-map flow shows Level 5 unlocked with progress persistence on refresh
+
+
+### Phase 7 (complete: Level 5 — The Tower finale)
+
+- Level 5 is now playable end-to-end with 3 screens in "The Tower"
+- Screen 1 introduces Morgana’s tower and a large "Knock on the Door" action
+- Screen 2 includes three kindness choices (flower, song, tea) that can be tapped in any order
+- Each kindness choice shows visible text and matching spoken narration
+- Screen 3 frees Princess Lily, celebrates with Morgana’s friendship, and shows sparkle/confetti reward
+- Inactivity hints highlight the door, untapped kindness choices, and finale actions after 15 seconds
+- Level 5 completion keeps progress at Level 5 (all levels remain unlocked)
+- "Play Again" now uses a friendly two-step confirmation and resets progress to Level 1
