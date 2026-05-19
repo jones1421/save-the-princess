@@ -640,10 +640,218 @@ function LevelThreeSparkleCave() {
   );
 }
 
+function LevelFourWitchsGarden() {
+  const [screen, setScreen] = useState<1 | 2 | 3>(1);
+  const [feedback, setFeedback] = useState(
+    "This is Morgana’s garden. It feels quiet, but not scary. Let’s go inside and see who lives here.",
+  );
+  const [seenStories, setSeenStories] = useState<
+    Record<"bunny" | "kitten" | "butterfly", boolean>
+  >({
+    bunny: false,
+    kitten: false,
+    butterfly: false,
+  });
+  const [hintTarget, setHintTarget] = useState<
+    "bunny" | "kitten" | "butterfly" | "flower" | null
+  >(null);
+  const [pickedFlower, setPickedFlower] = useState(false);
+
+  const allStoriesHeard =
+    seenStories.bunny && seenStories.kitten && seenStories.butterfly;
+
+  useEffect(() => {
+    if (screen === 2 && allStoriesHeard) {
+      setScreen(3);
+      const message =
+        "All the animals shared their stories. Tap the special flower!";
+      setFeedback(message);
+      speakFeedback(message);
+    }
+  }, [screen, allStoriesHeard]);
+
+  useEffect(() => {
+    setHintTarget(null);
+    if (screen === 2 && !allStoriesHeard) {
+      const timer = window.setTimeout(() => {
+        const nextAnimal =
+          (["bunny", "kitten", "butterfly"] as const).find(
+            (animalId) => !seenStories[animalId],
+          ) ?? null;
+        if (!nextAnimal) return;
+        const hint = "Tap a garden friend to hear their story.";
+        setHintTarget(nextAnimal);
+        setFeedback(hint);
+        speakFeedback(hint);
+      }, 15000);
+      return () => window.clearTimeout(timer);
+    }
+
+    if (screen === 3 && !pickedFlower) {
+      const timer = window.setTimeout(() => {
+        const hint = "Tap a garden friend to hear their story.";
+        setHintTarget("flower");
+        setFeedback(hint);
+        speakFeedback(hint);
+      }, 15000);
+      return () => window.clearTimeout(timer);
+    }
+  }, [screen, seenStories, allStoriesHeard, pickedFlower]);
+
+  const hearStory = (
+    animalId: "bunny" | "kitten" | "butterfly",
+    story: string,
+  ) => {
+    setSeenStories((prev) => ({ ...prev, [animalId]: true }));
+    setHintTarget(null);
+    setFeedback(story);
+    speakFeedback(story);
+  };
+
+  const pickFlower = () => {
+    if (pickedFlower) return;
+    const message =
+      "This flower came from Morgana’s own garden. Maybe it will help her feel loved.";
+    setPickedFlower(true);
+    setHintTarget(null);
+    setFeedback(message);
+    speakFeedback(message);
+    unlockAtLeast(5);
+  };
+
+  return (
+    <div className="space-y-5">
+      {screen === 1 && (
+        <>
+          <NarrationBox
+            text="This is Morgana’s garden. It feels quiet, but not scary. Let’s go inside and see who lives here."
+            autoSpeak
+          />
+          <div className="rounded-3xl border-4 border-emerald-200 bg-emerald-50 p-6 text-center">
+            <div className="h-56 rounded-2xl bg-gradient-to-b from-green-200 to-green-100 relative overflow-hidden">
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-green-300" />
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-10 h-36 w-44 rounded-t-[5rem] border-4 border-amber-800 bg-amber-600" />
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-24 text-4xl">
+                🌿
+              </div>
+              <div className="absolute left-8 bottom-8 text-4xl">🌸</div>
+              <div className="absolute right-10 bottom-8 text-4xl">🌼</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setScreen(2);
+                const message = "Let’s meet the friendly garden animals.";
+                setFeedback(message);
+                speakFeedback(message);
+              }}
+              className="mt-4 rounded-full bg-emerald-500 text-white font-extrabold text-xl px-8 py-4 min-h-24"
+            >
+              Tap the Garden Gate
+            </button>
+          </div>
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">
+            {feedback}
+          </p>
+        </>
+      )}
+
+      {screen === 2 && (
+        <>
+          <NarrationBox
+            text="Tap each garden friend to hear their story."
+            autoSpeak
+          />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {(
+              [
+                ["bunny", "🐰", "Bunny", "Morgana feeds me carrots every morning."],
+                ["kitten", "🐱", "Kitten", "Morgana gave me a warm blanket when I was cold."],
+                ["butterfly", "🦋", "Butterfly", "Morgana helped my wing feel better."],
+              ] as const
+            ).map(([animalId, emoji, label, story]) => {
+              const done = seenStories[animalId];
+              const highlighted = hintTarget === animalId;
+              return (
+                <button
+                  key={animalId}
+                  type="button"
+                  onClick={() => hearStory(animalId, story)}
+                  className={`rounded-3xl border-4 p-5 text-center min-h-24 transition ${done ? "border-yellow-400 bg-yellow-100" : highlighted ? "border-fuchsia-500 bg-fuchsia-100 ring-4 ring-fuchsia-300" : "border-green-300 bg-white hover:bg-green-100"}`}
+                >
+                  <div className="mx-auto h-24 w-24 rounded-full bg-white flex items-center justify-center text-6xl">
+                    {emoji}
+                  </div>
+                  <p className="mt-3 text-2xl font-extrabold text-emerald-700">
+                    {label}
+                  </p>
+                  <p className="mt-1 text-emerald-800">
+                    {done ? "Story heard!" : "Tap to hear story"}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">
+            {feedback}
+          </p>
+        </>
+      )}
+
+      {screen === 3 && (
+        <>
+          <NarrationBox
+            text="This flower came from Morgana’s own garden. Maybe it will help her feel loved."
+            autoSpeak
+          />
+          <div className="rounded-3xl border-4 border-pink-200 bg-pink-50 p-8 text-center">
+            <button
+              type="button"
+              onClick={pickFlower}
+              className={`mx-auto min-h-24 w-full max-w-md rounded-3xl border-4 p-6 transition ${
+                hintTarget === "flower"
+                  ? "border-fuchsia-500 bg-fuchsia-100 ring-4 ring-fuchsia-300"
+                  : "border-pink-300 bg-white hover:bg-pink-100"
+              }`}
+            >
+              <div className="text-7xl">{pickedFlower ? "🌸✨" : "🌸"}</div>
+              <p className="mt-3 text-2xl font-extrabold text-pink-700">
+                Forgotten Flower
+              </p>
+              <p className="mt-1 text-pink-800">
+                {pickedFlower ? "Picked up!" : "Tap to pick it up"}
+              </p>
+            </button>
+          </div>
+          <p className="rounded-xl bg-white p-3 text-xl font-semibold text-purple-700">
+            {feedback}
+          </p>
+          {pickedFlower && (
+            <div className="rounded-3xl border-4 border-yellow-300 bg-yellow-100 p-8 text-center min-h-24">
+              <div className="text-6xl">✨🌸✨🎉✨</div>
+              <p className="mt-4 text-3xl font-extrabold text-yellow-800">
+                Hooray! You discovered Morgana’s kind heart and unlocked Level
+                5!
+              </p>
+              <a
+                href="/map"
+                className={`mt-5 inline-flex items-center justify-center rounded-full bg-pink-500 text-white font-extrabold text-xl px-8 py-4 ${PRIMARY_TAP_TARGET}`}
+              >
+                Back to Map
+              </a>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 function PlaceholderGame({ levelId }: LevelGameShellProps) {
   if (levelId === 1) return <LevelOneForest />;
   if (levelId === 2) return <LevelTwoRainbowRiver />;
   if (levelId === 3) return <LevelThreeSparkleCave />;
+  if (levelId === 4) return <LevelFourWitchsGarden />;
 
   return (
     <div className="rounded-2xl border-4 border-indigo-300 bg-indigo-50 p-6 h-72 flex items-center justify-center text-center">

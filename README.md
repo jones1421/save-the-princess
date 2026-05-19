@@ -76,3 +76,13 @@ npm run build
 - Wrong helper taps keep the gentle guidance message: "Hmm, I don't think I can do that — try a different friend!"
 - Inactivity hints are included for Level 3 screens
 - Completing Level 3 unlocks Level 4 (`savetheprincess.progress = 4`) and auto-returns to map
+
+### Phase 6 (complete: Level 4 — The Witch's Garden)
+
+- Level 4 is now playable end-to-end with 3 screens in "The Witch's Garden"
+- Screen 1 introduces Morgana's quiet garden gate and starts the visit
+- Screen 2 features Bunny, Kitten, and Butterfly story taps with matching narration
+- Screen 3 lets players collect the forgotten flower and receive a sparkle reward
+- Inactivity hints highlight the next untapped animal or the flower after 15 seconds
+- Completing Level 4 unlocks Level 5 (`savetheprincess.progress = 5`)
+- Return-to-map flow shows Level 5 unlocked with progress persistence on refresh
